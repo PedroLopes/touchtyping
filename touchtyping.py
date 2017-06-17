@@ -1,5 +1,6 @@
 from Getch import getch
 from sys import argv
+from sys import exit
 import argparse
 
 def insert_separator(words, char):
@@ -9,7 +10,7 @@ def insert_separator(words, char):
         words_spaces.append(char)
     return words_spaces[:-1]
 
-parser = argparse.ArgumentParser(description='touch typing training in python')
+parser = argparse.ArgumentParser(description='touch typing training in python (use ESC to quit)')
 parser.add_argument('--strict', action="store_true", default=False)
 parser.add_argument('--exercise', action="store", dest="exercise", type=int)
 parser.add_argument('--study', action="store", dest="study")
@@ -17,7 +18,6 @@ parser.add_argument('--study', action="store", dest="study")
 vals = parser.parse_args()
 
 if vals.exercise != None:
-    print("exercises/"+str(vals.exercise)+".txt")
     file = open("exercises/"+str(vals.exercise)+".txt", "r") 
     words = file.read().split(" ")[:-1]
 else:
@@ -34,6 +34,8 @@ for word in words:
     i = 0
     while(i<len(word)):
         char = getch()
+        if char == '\x1b':
+            exit()
         if char == word[i]:
             print(char, end='',flush=True)
             i+=1
