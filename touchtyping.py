@@ -21,7 +21,6 @@ def resume_exercise(user, filename):
 def save_progress(user,filename,exercise):
     with open(filename, "r+") as f:
         content = f.readlines()
-        #content = [x.strip() for x in content]
         new_lines = []
         for line in content:
             index = line.find(user)
@@ -54,8 +53,8 @@ def execute_exercise(words,typos):
     return typos
 
 parser = argparse.ArgumentParser(description='touch typing training in python (use ESC to quit)')
-parser.add_argument('--no-strict', action="store_true", dest="no_strict", default=False)
-parser.add_argument('--exercise', action="store", dest="exercise", type=int)
+parser.add_argument('--no-strict', '-n', action="store_true", dest="no_strict", default=False)
+parser.add_argument('--exercise', '-e', action="store", dest="exercise", type=int)
 parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, default=3)
 parser.add_argument('--user','-u', action="store", dest="username")
 parser.add_argument('--filename', '-f', action="store", dest="filename", default="study_sessions.log")
