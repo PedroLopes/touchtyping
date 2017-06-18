@@ -16,12 +16,16 @@ def insert_separator(words, char):
 
 def resume_exercise(user, filename):
     try:
-        with open(filename) as f:
+        with open(filename,"a+") as f:
+            f.seek(0)
             content = f.readlines()
             content = [x.strip() for x in content]
             for line in content:
                 if line.find(user) != -1:
                     return int(line.split(":")[1])
+            print("user {} did not exist in {} logfile. Creating...".format(user,filename))
+            f.write(user+":1")
+            return 1
     except FileNotFoundError:
         print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file does not exist".format(user,filename))
         exit()
@@ -92,7 +96,7 @@ parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, 
 parser.add_argument('--wpm','-w', action="store", dest="min_wpm", type=int, default=20)
 parser.add_argument('--user','-u', action="store", dest="username")
 parser.add_argument('--filename', '-f', action="store", dest="filename", default="study_sessions.log")
-parser.add_argument('--exercise-foldr', '-ef', action="store", dest="exercise_folder", default="exercises")
+parser.add_argument('--exercise-folder', '-ef', action="store", dest="exercise_folder", default="exercises")
 args = parser.parse_args()
 
 
@@ -125,7 +129,7 @@ while True:
     words_per_minute = wpm(final_time, words)
     words_per_minute = round(words_per_minute, 2)
     print('\nFinished at {} wpm (min {}) with {} typos (max is {})'.format(words_per_minute,args.min_wpm,typos,args.max_typos))
-    if typos > args.max_typos and args.no_strict == False:
+    if typos => args.max_typos and args.no_strict == False:
         print('Too many typos. Try again')
     elif words_per_minute < args.min_wpm and args.no_strict == False:
         print('Too slow. Try again')
