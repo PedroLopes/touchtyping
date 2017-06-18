@@ -1,3 +1,6 @@
+from os import listdir
+from os.path import basename
+from os.path import splitext
 from Getch import getch
 from sys import argv
 from sys import exit
@@ -32,8 +35,17 @@ def save_progress(user,filename,exercise):
         f.write(''.join(new_lines))
         f.truncate()
 
+def find_last_exercise(folder):
+    exercise_index = [-1]
+    for filename in listdir(folder):
+        if filename.endswith(".txt"):
+            exercise_index.append(int(splitext(basename(filename))[0]))
+        else:
+            continue
+    return max(exercise_index)
+
 def load_exercise(number):
-    file = open("exercises/"+str(number)+".txt", "r") 
+    file = open(args.exercise_folder + "/" + str(number)+".txt", "r") 
     words = file.read().split(" ")[:-1]
     words = insert_separator(words, " ")
     return words
@@ -69,6 +81,7 @@ parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, 
 parser.add_argument('--wpm','-w', action="store", dest="min_wpm", type=int, default=20)
 parser.add_argument('--user','-u', action="store", dest="username")
 parser.add_argument('--filename', '-f', action="store", dest="filename", default="study_sessions.log")
+parser.add_argument('--exercise-foldr', '-ef', action="store", dest="exercise_folder", default="exercises")
 args = parser.parse_args()
 
 
@@ -80,10 +93,11 @@ if args.exercise != None:
 else:
     words = ["default", "exercise:", "please", "use", "> python touchtyping.py", "--help"]
 
-last_exercise = 3
+last_exercise = find_last_exercise(args.exercise_folder)
 
 while True:
     if args.exercise > last_exercise:
+        print("Congrats. That was the last exercise (you can always add more to the {} folder)".format(args.exercise_folder))
         break
     words = load_exercise(args.exercise)
     print(''.join(words))
