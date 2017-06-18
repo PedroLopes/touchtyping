@@ -2,6 +2,7 @@ from Getch import getch
 from sys import argv
 from sys import exit
 import argparse
+from time import time
 
 def insert_separator(words, char):
     words_spaces = []
@@ -37,12 +38,16 @@ def load_exercise(number):
     words = insert_separator(words, " ")
     return words
 
-def execute_exercise(words,typos):
+def execute_exercise(words,typos,begin_time):
+    first_char = True
     for word in words:
         char = ""
         i = 0
         while(i<len(word)):
             char = getch()
+            if first_char:
+                begin_time = time()
+                first_char = False
             if char == '\x1b':
                 exit()
             if char == word[i]:
@@ -50,12 +55,18 @@ def execute_exercise(words,typos):
                 i+=1
             else:
                 typos+=1
-    return typos
+    return typos, begin_time
+
+def wpm(time, words):
+    word_length = len((''.join(words)).split(" "))
+    words_per_m = word_length / time
+    return words_per_m
 
 parser = argparse.ArgumentParser(description='touch typing training in python (use ESC to quit)')
 parser.add_argument('--no-strict', '-n', action="store_true", dest="no_strict", default=False)
 parser.add_argument('--exercise', '-e', action="store", dest="exercise", type=int)
 parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, default=3)
+parser.add_argument('--wpm','-w', action="store", dest="min_wpm", type=int, default=20)
 parser.add_argument('--user','-u', action="store", dest="username")
 parser.add_argument('--filename', '-f', action="store", dest="filename", default="study_sessions.log")
 args = parser.parse_args()
@@ -77,10 +88,20 @@ while True:
     words = load_exercise(args.exercise)
     print(''.join(words))
     typos = 0
-    typos = execute_exercise(words,typos)
-    print('\nFinished with {} typos (max is {})'.format(typos,args.max_typos))
+    begin_time = 0
+    typos, begin_time = execute_exercise(words,typos,begin_time)
+    end_time = time()
+    #print("begin_time:{} end_time:{} sub:{}".format(begin_time, end_time, end_time - begin_time))
+    final_time = (end_time - begin_time) / 60
+    final_time = round(final_time, 2)
+    words_per_minute = wpm(final_time, words)
+    words_per_minute = round(words_per_minute, 2)
+    print('\nFinished at {} wpm (min {}) with {} typos (max is {})'.format(words_per_minute,args.min_wpm,typos,args.max_typos))
     if typos > args.max_typos and args.no_strict == False:
         print('Too many typos. Try again')
+    if words_per_minute < args.min_wpm and args.no_strict == False:
+        print('Too slow. Try again')
     else:
         args.exercise+=1
-        save_progress(args.username,args.filename,args.exercise)
+        if args.username: 
+                save_progress(args.username,args.filename,args.exercise)
