@@ -15,25 +15,32 @@ def insert_separator(words, char):
     return words_spaces[:-1]
 
 def resume_exercise(user, filename):
-    with open(filename) as f:
-        content = f.readlines()
-        content = [x.strip() for x in content]
-        for line in content:
-            if line.find(user) != -1:
-                return int(line.split(":")[1])
+    try:
+        with open(filename) as f:
+            content = f.readlines()
+            content = [x.strip() for x in content]
+            for line in content:
+                if line.find(user) != -1:
+                    return int(line.split(":")[1])
+    except FileNotFoundError:
+        print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file does not exist".format(user,filename))
+        exit()
 
 def save_progress(user,filename,exercise):
-    with open(filename, "r+") as f:
-        content = f.readlines()
-        new_lines = []
-        for line in content:
-            index = line.find(user)
-            if index != -1:
-                line = str(line.split(":")[0])+":"+str(exercise)+"\n"
-            new_lines.append(line)
-        f.seek(0)
-        f.write(''.join(new_lines))
-        f.truncate()
+    try:
+        with open(filename, "r+") as f:
+            content = f.readlines()
+            new_lines = []
+            for line in content:
+                index = line.find(user)
+                if index != -1:
+                    line = str(line.split(":")[0])+":"+str(exercise)+"\n"
+                new_lines.append(line)
+            f.seek(0)
+            f.write(''.join(new_lines))
+            f.truncate()
+    except FileNotFoundError:
+        print("Error: cannot save user's ({}) progress to log file {}. This file does not exist. Your last exercise was {}".format(user,filename, exercise))
 
 def find_last_exercise(folder):
     exercise_index = [-1]
@@ -45,10 +52,14 @@ def find_last_exercise(folder):
     return max(exercise_index)
 
 def load_exercise(number):
-    file = open(args.exercise_folder + "/" + str(number)+".txt", "r") 
-    words = file.read().split(" ")[:-1]
-    words = insert_separator(words, " ")
-    return words
+    try:
+        file = open(args.exercise_folder + "/" + str(number)+".txt", "r") 
+        words = file.read().split(" ")[:-1]
+        words = insert_separator(words, " ")
+        return words
+    except FileNotFoundError:
+        print("Error: cannot open exercise with filename {}.txt This file does not exist. Please make sure your exercises are named accordingly. Will attempt skipping to next exercise.".format(number))
+        return -1
 
 def execute_exercise(words,typos,begin_time):
     first_char = True
@@ -100,6 +111,9 @@ while True:
         print("Congrats. That was the last exercise (you can always add more to the {} folder)".format(args.exercise_folder))
         break
     words = load_exercise(args.exercise)
+    if words == -1:
+        args.exercise+=1
+        continue
     print(''.join(words))
     typos = 0
     begin_time = 0
@@ -113,7 +127,7 @@ while True:
     print('\nFinished at {} wpm (min {}) with {} typos (max is {})'.format(words_per_minute,args.min_wpm,typos,args.max_typos))
     if typos > args.max_typos and args.no_strict == False:
         print('Too many typos. Try again')
-    if words_per_minute < args.min_wpm and args.no_strict == False:
+    elif words_per_minute < args.min_wpm and args.no_strict == False:
         print('Too slow. Try again')
     else:
         args.exercise+=1
