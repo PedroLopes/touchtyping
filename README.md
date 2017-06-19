@@ -32,3 +32,10 @@ Nothing special here. The only things to keep in mind is:
 1. There is a file ``study_sessions.log`` which saves your progress if you start the trainer in the **username mode** using ``python3 touchtyping.py -u name``. 
 2. If your username is not on that file (first time you are starting with a new user name) it will be created.
 3. If you wish to change this file (defaul is ``study_sessions.log``) you can invoke it as such:  ``python3 touchtyping.py --filename othername.txt"``
+
+#### To do and ideas
+* Give hints, use a special symbol on exercise file to mark what is a hint. Then when hint modes are enabled or after the first failure, the user is presented with hint text. 
+* colorful mode
+* refresh shell mode (after every exercise or attempt)
+* save not only where you are but also best scores
+* allow mode to redo exercises

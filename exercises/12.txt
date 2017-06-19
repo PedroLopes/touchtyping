@@ -1,0 +1,1 @@
+There is a blind spot in HCI's evaluation methodology: we rarely consider the implications of the fact that a prototype can never be fully evaluated in a study. 
