@@ -7,6 +7,7 @@ from sys import exit
 import argparse
 from time import time
 
+
 def insert_separator(words, char):
     words_spaces = []
     for w in words:
@@ -68,21 +69,37 @@ def load_exercise(number):
 
 def execute_exercise(words,typos,begin_time):
     first_char = True
-    for word in words:
+    escape_pressed_twice_interval = 1
+    escape_pressed = 0
+    j = 0
+    while j<len(words):
+        #print(words)
+        word = words[j]
+        #print("word is {} and j is {}".format(word,j))
         char = ""
         i = 0
         while(i<len(word)):
+            #print(i)
             char = getch()
             if first_char:
                 begin_time = time()
                 first_char = False
-            if char == '\x1b':
+            if char == '\x1b' and time() - escape_pressed > escape_pressed_twice_interval:
+                print("\nRetry (press ESC twice to quit)\n{}".format(''.join(words)))
+                typos=0
+                first_char = True
+                escape_pressed = time()
+                j=-1
+                break
+            if char == '\x1b' and time() - escape_pressed < escape_pressed_twice_interval:
+                print("\nExiting (user pressed ESC twice)")
                 exit()
             if char == word[i]:
                 print(char, end='',flush=True)
                 i+=1
             else:
                 typos+=1
+        j+=1
     return typos, begin_time
 
 def wpm(time, words):
@@ -90,7 +107,7 @@ def wpm(time, words):
     words_per_m = word_length / time
     return words_per_m
 
-parser = argparse.ArgumentParser(description='touch typing training in python (use ESC to quit)')
+parser = argparse.ArgumentParser(description='touch typing trainer in python (use ESC to retry and ESC twice to quit)')
 parser.add_argument('--no-strict', '-n', action="store_true", dest="no_strict", default=False)
 parser.add_argument('--exercise', '-e', action="store", dest="exercise", type=int)
 parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, default=3)
