@@ -58,8 +58,9 @@ def find_last_exercise(folder):
 def load_exercise(number):
     try:
         file = open(args.exercise_folder + "/" + str(number)+".txt", "r") 
-        words = file.read().split(" ")[:-1]
+        words = file.read().split(" ")#[:-1]
         words = insert_separator(words, " ")
+        words[-1] = words[-1].strip()
         return words
     except FileNotFoundError:
         print("Error: cannot open exercise with filename {}.txt This file does not exist. Please make sure your exercises are named accordingly. Will attempt skipping to next exercise.".format(number))
@@ -129,7 +130,7 @@ while True:
     words_per_minute = wpm(final_time, words)
     words_per_minute = round(words_per_minute, 2)
     print('\nFinished at {} wpm (min {}) with {} typos (max is {})'.format(words_per_minute,args.min_wpm,typos,args.max_typos))
-    if typos => args.max_typos and args.no_strict == False:
+    if typos >= args.max_typos and args.no_strict == False:
         print('Too many typos. Try again')
     elif words_per_minute < args.min_wpm and args.no_strict == False:
         print('Too slow. Try again')
