@@ -1,7 +1,7 @@
 # touchtyping
 A basic touch typing trainer (for python3). Created for those moments in which ratatype is down or you are offline. 
 
-
+![image](https://raw.githubusercontent.com/PedroLopes/touchtyping/master/images/demo.gif)
 
 I realized later that this was loosely inspired after ratatype (any similarity is purely coincidental, but the default values for minimum wpm and maximum typos offer great learning potential).
 
