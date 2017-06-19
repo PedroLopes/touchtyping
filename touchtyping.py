@@ -124,7 +124,7 @@ if args.username != None:
 if args.exercise != None:
     words = load_exercise(args.exercise)
 else:
-    words = ["default", "exercise:", "please", "use", "> python touchtyping.py", "--help"]
+    args.exercise = 1
 
 last_exercise = find_last_exercise(args.exercise_folder)
 
