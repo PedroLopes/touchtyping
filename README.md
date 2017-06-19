@@ -11,9 +11,10 @@ I realized later that this was loosely inspired after ratatype (any similarity i
 * ``python3 touchtyping.py -e 1``: loads exercise numer "1"
 
 ## key mapping
-Nothing special here. The only things to keep in mind is:
+Nothing special here. The only things to keep in mind are:
+
 * **ESC**: restarts the current exercise (clearing typos and wpm)
-* **ESC** twice (in less than 1 second): quits the application
+* **ESC twice** (in less than 1 second): quits the application
 
 ## advanced usage
 * ``python3 touchtyping.py --filename othername.txt"``: loads "othername.txt" as the save file for usernames and their exercises
@@ -26,14 +27,14 @@ Nothing special here. The only things to keep in mind is:
 1. **To create new exercises**: simple save them as a numbered .txt file (e.g., 1.txt). Exercise files should only contain the string of characters that you wish to display.
 2. **Example** of a ``1.txt`` file contents:
    ``this is a file for the touchtyping trainner``
-3. **Put exercise files** in the ``exercises`` folder (default) or in your ``own-folder`` and call ``python3 touchtyping.py --exercise-folder own-folder``
+3. **Put exercise files** in the ``exercises`` folder (default) or in your ``own-folder``, to read files from a custom folder use ``python3 touchtyping.py --exercise-folder own-folder`` instead.
    
 ### saving sessions for enabling continuous study
 1. There is a file ``study_sessions.log`` which saves your progress if you start the trainer in the **username mode** using ``python3 touchtyping.py -u name``. 
 2. If your username is not on that file (first time you are starting with a new user name) it will be created.
 3. If you wish to change this file (defaul is ``study_sessions.log``) you can invoke it as such:  ``python3 touchtyping.py --filename othername.txt"``
 
-#### To do and ideas
+#### To do and idea collection
 * Give hints, use a special symbol on exercise file to mark what is a hint. Then when hint modes are enabled or after the first failure, the user is presented with hint text. 
 * colorful mode
 * refresh shell mode (after every exercise or attempt)
