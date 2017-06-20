@@ -158,7 +158,7 @@ if args.username != None:
 if args.exercise != None:
     exercise = args.exercise
     words = load_exercise(exercise)
-else:
+elif args.username == None:
     exercise = 1
 
 last_exercise = find_last_exercise(args.exercise_folder)
