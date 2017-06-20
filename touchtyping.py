@@ -6,7 +6,9 @@ from sys import argv
 from sys import exit
 import argparse
 from time import time
+from time import asctime
 
+separator="/"
 
 def insert_separator(words, char):
     words_spaces = []
@@ -15,31 +17,49 @@ def insert_separator(words, char):
         words_spaces.append(char)
     return words_spaces[:-1]
 
-def resume_exercise(user, filename):
+def resume_exercise(user, saved_state_dir):
     try:
-        with open(filename,"a+") as f:
+        with open(saved_state_dir+"/"+user+".txt","a+") as f:
             f.seek(0)
             content = f.readlines()
+            if not content:
+                raise FileNotFoundError
             content = [x.strip() for x in content]
-            for line in content:
-                if line.find(user) != -1:
-                    return int(line.split(":")[1])
-            print("user {} did not exist in {} logfile. Creating...".format(user,filename))
-            f.write(user+":1")
-            return 1
+            line = content[0] 
+            if line.find("last") != -1:
+                print("found {}".format(line.split(separator)[1]))
+                return int(line.split(separator)[1])
     except FileNotFoundError:
-        print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file does not exist".format(user,filename))
-        exit()
+        print("user {} did not exist in {} logfile. Creating...".format(user,saved_state_dir))
+        new_entry = []
+        new_entry.append(user)
+        new_entry.append(str(1))
+        new_entry.append(asctime())
+        with open(saved_state_dir+"/"+user+".txt","a+") as f:
+            f.seek(0)
+            f.write(separator.join(new_entry))
+        return 1
+        #print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file does not exist".format(user,filename))
+        #exit()
 
-def save_progress(user,filename,exercise):
+def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
     try:
-        with open(filename, "r+") as f:
+        with open(saved_state_dir+"/"+user+".txt", "r+") as f:
             content = f.readlines()
             new_lines = []
-            for line in content:
-                index = line.find(user)
+            update_last = content[0].split(separator)
+            update_last[1] = str(exercise)
+            new_lines.append(separator.join(update_last))
+            for line in content[1:]:
+                index = line.find(str(exercise))
                 if index != -1:
-                    line = str(line.split(":")[0])+":"+str(exercise)+"\n"
+                    segments = line.split(separator)
+                    if wpm_data > float(segments[1]):
+                        segments[1]=str(wpm_data)
+                    if typos_data < int(segments[2]):
+                        segments[2] = str(typos_data)
+                    line = ':'.join(segments)
+                print(line)
                 new_lines.append(line)
             f.seek(0)
             f.write(''.join(new_lines))
@@ -113,13 +133,13 @@ parser.add_argument('--exercise', '-e', action="store", dest="exercise", type=in
 parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, default=3)
 parser.add_argument('--wpm','-w', action="store", dest="min_wpm", type=int, default=20)
 parser.add_argument('--user','-u', action="store", dest="username")
-parser.add_argument('--filename', '-f', action="store", dest="filename", default="study_sessions.log")
-parser.add_argument('--exercise-folder', '-ef', action="store", dest="exercise_folder", default="exercises")
+parser.add_argument('--save-dir', '-s', action="store", dest="saved_state_dir", default="saved_state")
+parser.add_argument('--exercise-dir', '-ef', action="store", dest="exercise_folder", default="exercises")
 args = parser.parse_args()
 
 
 if args.username != None:
-    args.exercise = resume_exercise(args.username, args.filename)
+    args.exercise = resume_exercise(args.username, args.saved_state_dir)
     print("For user {}, will resume study at exercise no. {}".format(args.username,args.exercise))
 if args.exercise != None:
     words = load_exercise(args.exercise)
@@ -154,4 +174,4 @@ while True:
     else:
         args.exercise+=1
         if args.username: 
-                save_progress(args.username,args.filename,args.exercise)
+                save_progress(args.exercise,words_per_minute,typos,args.username,args.saved_state_dir)

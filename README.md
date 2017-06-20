@@ -35,8 +35,14 @@ Nothing special here. The only things to keep in mind are:
 3. If you wish to change this file (defaul is ``study_sessions.log``) you can invoke it as such:  ``python3 touchtyping.py --filename othername.txt"``
 
 #### To do and idea collection
+* alias as command
+* pip install
 * Give hints, use a special symbol on exercise file to mark what is a hint. Then when hint modes are enabled or after the first failure, the user is presented with hint text. 
 * colorful mode
 * refresh shell mode (after every exercise or attempt)
 * save not only where you are but also best scores
+  * load new "last" by keyword on user.txt
+  * load all exercise scores into a table? or access file always? (prob ok)
+  * print score
 * allow mode to redo exercises
+* if you typer super fast you can get division by zero, fix
