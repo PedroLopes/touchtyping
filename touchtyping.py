@@ -26,42 +26,52 @@ def resume_exercise(user, saved_state_dir):
                 raise FileNotFoundError
             content = [x.strip() for x in content]
             line = content[0] 
-            if line.find("last") != -1:
-                print("found {}".format(line.split(separator)[1]))
+            if line.find(user) != -1:
                 return int(line.split(separator)[1])
+            else :
+                print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file is missing the first line?".format(user,filename))
+                exit()
     except FileNotFoundError:
-        print("user {} did not exist in {} logfile. Creating...".format(user,saved_state_dir))
+        print("User's {} logfile did not exist. Creating...".format(user,saved_state_dir))
         new_entry = []
         new_entry.append(user)
         new_entry.append(str(1))
-        new_entry.append(asctime())
+        new_entry.append(asctime()+"\n")
         with open(saved_state_dir+"/"+user+".txt","a+") as f:
             f.seek(0)
             f.write(separator.join(new_entry))
         return 1
-        #print("Error: cannot find user's ({}) last exercise to resume on log file {}. Log file does not exist".format(user,filename))
-        #exit()
 
 def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
+    print("Will try to save")
     try:
         with open(saved_state_dir+"/"+user+".txt", "r+") as f:
             content = f.readlines()
             new_lines = []
             update_last = content[0].split(separator)
-            update_last[1] = str(exercise)
+            update_last[1] = str(exercise+1)
             new_lines.append(separator.join(update_last))
-            for line in content[1:]:
+            i = 1
+            found = False
+            while i<len(content):
+                line = content[i]
                 index = line.find(str(exercise))
                 if index != -1:
+                    print("Updating previous score for exercise {}".format(exercise))
+                    found =True
                     segments = line.split(separator)
                     if wpm_data > float(segments[1]):
                         segments[1]=str(wpm_data)
-                    if typos_data < int(segments[2]):
-                        segments[2] = str(typos_data)
-                    line = ':'.join(segments)
-                print(line)
+                    #if typos_data < int(segments[2]):
+                        segments[2] = str(typos_data)+"\n"
+                    line = separator.join(segments)
+                new_lines.append(line)
+                i+= 1
+            if not found:
+                line = separator.join([str(exercise),str(wpm_data),str(typos_data)+"\n"])
                 new_lines.append(line)
             f.seek(0)
+            # would be neat to sort this alphabetical according to exercise number
             f.write(''.join(new_lines))
             f.truncate()
     except FileNotFoundError:
@@ -124,7 +134,11 @@ def execute_exercise(words,typos,begin_time):
 
 def wpm(time, words):
     word_length = len((''.join(words)).split(" "))
-    words_per_m = word_length / time
+    if time == 0:
+        print("Warning: you were obscenely fast. Are you human?")
+        words_per_m = 9001
+    else:
+        words_per_m = word_length / time
     return words_per_m
 
 parser = argparse.ArgumentParser(description='touch typing trainer in python (use ESC to retry and ESC twice to quit)')
@@ -139,22 +153,23 @@ args = parser.parse_args()
 
 
 if args.username != None:
-    args.exercise = resume_exercise(args.username, args.saved_state_dir)
+    exercise = resume_exercise(args.username, args.saved_state_dir)
     print("For user {}, will resume study at exercise no. {}".format(args.username,args.exercise))
 if args.exercise != None:
-    words = load_exercise(args.exercise)
+    exercise = args.exercise
+    words = load_exercise(exercise)
 else:
-    args.exercise = 1
+    exercise = 1
 
 last_exercise = find_last_exercise(args.exercise_folder)
 
 while True:
-    if args.exercise > last_exercise:
+    if exercise > last_exercise:
         print("Congrats. That was the last exercise (you can always add more to the {} folder)".format(args.exercise_folder))
         break
-    words = load_exercise(args.exercise)
+    words = load_exercise(exercise)
     if words == -1:
-        args.exercise+=1
+        exercise+=1
         continue
     print(''.join(words))
     typos = 0
@@ -172,6 +187,6 @@ while True:
     elif words_per_minute < args.min_wpm and args.no_strict == False:
         print('Too slow. Try again')
     else:
-        args.exercise+=1
         if args.username: 
-                save_progress(args.exercise,words_per_minute,typos,args.username,args.saved_state_dir)
+                save_progress(exercise,words_per_minute,typos,args.username,args.saved_state_dir)
+        exercise+=1
