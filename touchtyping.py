@@ -7,6 +7,7 @@ from sys import exit
 import argparse
 from time import time
 from time import asctime
+from time import localtime
 
 separator="/"
 
@@ -43,7 +44,6 @@ def resume_exercise(user, saved_state_dir):
         return 1
 
 def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
-    print("Will try to save")
     try:
         with open(saved_state_dir+"/"+user+".txt", "r+") as f:
             content = f.readlines()
@@ -63,12 +63,13 @@ def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
                     if wpm_data > float(segments[1]):
                         segments[1]=str(wpm_data)
                     #if typos_data < int(segments[2]):
-                        segments[2] = str(typos_data)+"\n"
+                        segments[2] = str(typos_data)
+                        segments[3] = str(asctime())+"\n"
                     line = separator.join(segments)
                 new_lines.append(line)
                 i+= 1
             if not found:
-                line = separator.join([str(exercise),str(wpm_data),str(typos_data)+"\n"])
+                line = separator.join([str(exercise),str(wpm_data),str(typos_data),str(asctime())+"\n"])
                 new_lines.append(line)
             f.seek(0)
             # would be neat to sort this alphabetical according to exercise number
@@ -135,26 +136,46 @@ def execute_exercise(words,typos,begin_time):
 def wpm(time, words):
     word_length = len((''.join(words)).split(" "))
     if time == 0:
-        print("Warning: you were obscenely fast. Are you human?")
+        print("\nWarning: you were obscenely fast. Are you human?", end='')
         words_per_m = 9001
     else:
         words_per_m = word_length / time
     return words_per_m
 
+def show_score(username, saved_state_dir):
+    try:
+        with open(saved_state_dir+"/"+username+".txt", "r") as f:
+            content = f.readlines()
+            print(content)
+            print("{}'s score:".format(username))
+            print("------------------------------------")
+            print("exercise#\twpm\ttypos\tdate")
+            for line in content[1:]:
+                print(line)
+                segments = line.split(separator)
+                print(segments)
+                print("{}\t\t{}\t{}\t{}".format(segments[0],segments[1],segments[2],segments[3]))
+            print("------------------------------------")
+    except FileNotFoundError:
+        print("Error: cannot save user's ({}) progress to log file {}. This file does not exist. Your last exercise was {}".format(user,filename, exercise))
+
 parser = argparse.ArgumentParser(description='touch typing trainer in python (use ESC to retry and ESC twice to quit)')
 parser.add_argument('--no-strict', '-n', action="store_true", dest="no_strict", default=False)
+parser.add_argument('--score', '-s', action="store_true", dest="show_score", default=False)
 parser.add_argument('--exercise', '-e', action="store", dest="exercise", type=int)
 parser.add_argument('--typos','-t', action="store", dest="max_typos", type=int, default=3)
 parser.add_argument('--wpm','-w', action="store", dest="min_wpm", type=int, default=20)
 parser.add_argument('--user','-u', action="store", dest="username")
-parser.add_argument('--save-dir', '-s', action="store", dest="saved_state_dir", default="saved_state")
-parser.add_argument('--exercise-dir', '-ef', action="store", dest="exercise_folder", default="exercises")
+parser.add_argument('--save-dir', '-sd', action="store", dest="saved_state_dir", default="saved_state")
+parser.add_argument('--exercise-dir', '-ed', action="store", dest="exercise_folder", default="exercises")
 args = parser.parse_args()
 
 
 if args.username != None:
     exercise = resume_exercise(args.username, args.saved_state_dir)
     print("For user {}, will resume study at exercise no. {}".format(args.username,args.exercise))
+    if args.show_score:
+        show_score(args.username, args.saved_state_dir)
 if args.exercise != None:
     exercise = args.exercise
     words = load_exercise(exercise)
@@ -162,6 +183,7 @@ elif args.username == None:
     exercise = 1
 
 last_exercise = find_last_exercise(args.exercise_folder)
+
 
 while True:
     if exercise > last_exercise:

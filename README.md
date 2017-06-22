@@ -44,5 +44,6 @@ Nothing special here. The only things to keep in mind are:
   * load new "last" by keyword on user.txt
   * load all exercise scores into a table? or access file always? (prob ok)
   * print score
+  * scores from all users?
 * allow mode to redo exercises
 * if you typer super fast you can get division by zero, fix
