@@ -56,7 +56,6 @@ def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
             #while i<len(content): #this was so wrong
             for line in content[1:]:
                 segments = line.split(separator)
-                print("trying to find {}".format(exercise))
                 if segments[0] == str(exercise):
                     found =True
                     if wpm_data > float(segments[1]):
@@ -68,11 +67,9 @@ def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
                     line = separator.join(segments)
                 new_lines.append(line)
             if not found:
-                print("not found side...")
                 line = separator.join([str(exercise),str(wpm_data),str(typos_data),str(asctime())+"\n"])
                 new_lines.append(line)
             f.seek(0)
-            print(new_lines)
             # would be neat to sort this alphabetical according to exercise number
             f.write(''.join(new_lines))
             f.truncate()
@@ -105,13 +102,10 @@ def execute_exercise(words,typos,begin_time):
     escape_pressed = 0
     j = 0
     while j<len(words):
-        #print(words)
         word = words[j]
-        #print("word is {} and j is {}".format(word,j))
         char = ""
         i = 0
         while(i<len(word)):
-            #print(i)
             char = getch()
             if first_char:
                 begin_time = time()
