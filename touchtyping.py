@@ -53,25 +53,27 @@ def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
             new_lines.append(separator.join(update_last))
             i = 1
             found = False
-            while i<len(content):
-                line = content[i]
-                index = line.find(str(exercise))
-                if index != -1:
+            #while i<len(content): #this was so wrong
+            for line in content:
+                segments = line.split(separator)
+                print("trying to find {}".format(exercise))
+                if segments[0] == str(exercise):
                     print("Updating previous score for exercise {}".format(exercise))
                     found =True
-                    segments = line.split(separator)
                     if wpm_data > float(segments[1]):
+                        print("new wpm side...")
                         segments[1]=str(wpm_data)
                     #if typos_data < int(segments[2]):
                         segments[2] = str(typos_data)
                         segments[3] = str(asctime())+"\n"
                     line = separator.join(segments)
                 new_lines.append(line)
-                i+= 1
             if not found:
+                print("not found side...")
                 line = separator.join([str(exercise),str(wpm_data),str(typos_data),str(asctime())+"\n"])
                 new_lines.append(line)
             f.seek(0)
+            print(new_lines)
             # would be neat to sort this alphabetical according to exercise number
             f.write(''.join(new_lines))
             f.truncate()
