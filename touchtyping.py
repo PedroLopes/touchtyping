@@ -54,14 +54,13 @@ def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
             i = 1
             found = False
             #while i<len(content): #this was so wrong
-            for line in content:
+            for line in content[1:]:
                 segments = line.split(separator)
                 print("trying to find {}".format(exercise))
                 if segments[0] == str(exercise):
-                    print("Updating previous score for exercise {}".format(exercise))
                     found =True
                     if wpm_data > float(segments[1]):
-                        print("new wpm side...")
+                        print("Updating previous score for exercise {}".format(exercise))
                         segments[1]=str(wpm_data)
                     #if typos_data < int(segments[2]):
                         segments[2] = str(typos_data)
