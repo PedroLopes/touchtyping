@@ -7,7 +7,6 @@ from sys import exit
 import argparse
 from time import time
 from time import asctime
-from time import localtime
 
 separator="/"
 
@@ -44,6 +43,7 @@ def resume_exercise(user, saved_state_dir):
         return 1
 
 def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
+    print("Will save progress for {}".format(exercise))
     try:
         with open(saved_state_dir+"/"+user+".txt", "r+") as f:
             content = f.readlines()
@@ -146,16 +146,13 @@ def show_score(username, saved_state_dir):
     try:
         with open(saved_state_dir+"/"+username+".txt", "r") as f:
             content = f.readlines()
-            print(content)
             print("{}'s score:".format(username))
-            print("------------------------------------")
+            print("--------------------------------------------------------")
             print("exercise#\twpm\ttypos\tdate")
             for line in content[1:]:
-                print(line)
                 segments = line.split(separator)
-                print(segments)
-                print("{}\t\t{}\t{}\t{}".format(segments[0],segments[1],segments[2],segments[3]))
-            print("------------------------------------")
+                print("{}\t\t{}\t{}\t{}".format(segments[0],segments[1],segments[2],segments[3]),end='')
+            print("--------------------------------------------------------")
     except FileNotFoundError:
         print("Error: cannot save user's ({}) progress to log file {}. This file does not exist. Your last exercise was {}".format(user,filename, exercise))
 
