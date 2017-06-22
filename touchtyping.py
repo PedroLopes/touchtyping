@@ -43,7 +43,6 @@ def resume_exercise(user, saved_state_dir):
         return 1
 
 def save_progress(exercise,wpm_data,typos_data,user,saved_state_dir):
-    print("Will save progress for {}".format(exercise))
     try:
         with open(saved_state_dir+"/"+user+".txt", "r+") as f:
             content = f.readlines()
