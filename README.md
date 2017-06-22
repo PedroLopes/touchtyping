@@ -21,6 +21,8 @@ If you start the program with ``python3 touchtyping.py -u name`` you start as us
 * automatically save your progress when you advance lessons
 * save your last exercise
 * display your score upon request: ``touchtyping.py -u name --score``
+
+![image](https://raw.githubusercontent.com/PedroLopes/touchtyping/master/images/score.gif)
  
 ### more advanced usage
 * ``python3 touchtyping.py --filename othername.txt"``: loads "othername.txt" as the save file for usernames and their exercises
